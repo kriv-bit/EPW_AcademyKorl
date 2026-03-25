@@ -41,7 +41,16 @@ public class Course {
     @UpdateTimestamp
     @Column(nullable = false)
     private Instant updatedAt;
+    /**
+     * Many-to-One relationship with Instructor [cite: 554-556].
+     */
+    @ManyToOne
+    @JoinColumn(name = "instructor_id")
+    private Instructor instructor;
 
+    // Add these Getters and Setters at the bottom [cite: 558-562]
+    public Instructor getInstructor() { return instructor; }
+    public void setInstructor(Instructor instructor) { this.instructor = instructor; }
     // Default constructor
     public Course() {
     }

@@ -4,22 +4,32 @@ import com.academy.kevin.dto.CourseResponse;
 import com.academy.kevin.dto.CreateCourseRequest;
 import com.academy.kevin.dto.UpdateCourseRequest;
 import com.academy.kevin.entity.Course;
-import com.academy.kevin.exception.ResourceNotFoundException; // You need this from Guide 6
+import com.academy.kevin.entity.Instructor;
+import com.academy.kevin.exception.ResourceNotFoundException;
 import com.academy.kevin.repository.CourseRepository;
+import com.academy.kevin.repository.InstructorRepository;
 import com.academy.kevin.service.CourseService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * Complete implementation of CourseService with Instructor relationship.
+ */
 @Service
 @Transactional
 public class CourseServiceImpl implements CourseService {
 
     private final CourseRepository repository;
+    private final InstructorRepository instructorRepository;
 
-    public CourseServiceImpl(CourseRepository repository) {
+    /**
+     * Constructor injection for both repositories.
+     */
+    public CourseServiceImpl(CourseRepository repository, InstructorRepository instructorRepository) {
         this.repository = repository;
+        this.instructorRepository = instructorRepository;
     }
 
     @Override
@@ -27,6 +37,14 @@ public class CourseServiceImpl implements CourseService {
         Course course = new Course();
         course.setName(request.getName());
         course.setDescription(request.getDescription());
+
+        // Point 5: Relationship with Instructor 
+        if (request.getInstructorId() != null) {
+            Instructor instructor = instructorRepository.findById(request.getInstructorId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Instructor " + request.getInstructorId() + " not found"));
+            course.setInstructor(instructor);
+        }
+
         Course saved = repository.save(course);
         return toResponse(saved);
     }
@@ -37,28 +55,24 @@ public class CourseServiceImpl implements CourseService {
         return repository.findAll().stream().map(this::toResponse).toList();
     }
 
-    /**
-     * Complete Update Logic [cite: 371-375].
-     */
     @Override
     public CourseResponse update(Long id, UpdateCourseRequest request) {
-        // 1. Find the existing course or throw exception [cite: 372, 375]
         Course course = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Course " + id + " not found"));
 
-        // 2. Update fields [cite: 373, 376]
         course.setName(request.getName());
         course.setDescription(request.getDescription());
         
-        // Update active status if provided [cite: 377]
         if (request.getActive() != null) {
             course.setActive(request.getActive());
         }
 
-        // 3. Save and return [cite: 387]
         return toResponse(repository.save(course));
     }
 
+    /**
+     * Helper method to map Entity to Response DTO.
+     */
     private CourseResponse toResponse(Course course) {
         CourseResponse response = new CourseResponse();
         response.setId(course.getId());
@@ -66,6 +80,13 @@ public class CourseServiceImpl implements CourseService {
         response.setDescription(course.getDescription());
         response.setActive(course.getActive());
         response.setCreatedAt(course.getCreatedAt());
+
+        // Point 5: Map Instructor details to the response if they exist 
+        if (course.getInstructor() != null) {
+            response.setInstructorId(course.getInstructor().getId());
+            response.setInstructorName(course.getInstructor().getName());
+        }
+
         return response;
     }
 }

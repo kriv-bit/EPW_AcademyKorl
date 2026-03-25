@@ -12,7 +12,13 @@ public class CourseResponse {
     private String description;
     private Boolean active;
     private Instant createdAt;
+    private Long instructorId; // [cite: 580]
+    private String instructorName;
 
+    public Long getInstructorId() { return instructorId; } // [cite: 582-584]
+    public void setInstructorId(Long instructorId) { this.instructorId = instructorId; } // [cite: 585-587]
+    public String getInstructorName() { return instructorName; } // [cite: 588-590]
+    public void setInstructorName(String instructorName) { this.instructorName = instructorName; } // [cite: 591-593]
     // Getters and Setters [cite: 243-248]
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

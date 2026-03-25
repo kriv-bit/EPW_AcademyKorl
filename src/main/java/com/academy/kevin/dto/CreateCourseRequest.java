@@ -15,7 +15,10 @@ public class CreateCourseRequest {
 
     @Size(max = 500, message = "Description must be <= 500 chars")
     private String description;
+    private Long instructorId; // [cite: 570]
 
+    public Long getInstructorId() { return instructorId; } // [cite: 572-574]
+    public void setInstructorId(Long instructorId) { this.instructorId = instructorId; } // [cite: 575-576]
     // Getters and Setters
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
